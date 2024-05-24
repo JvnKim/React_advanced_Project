@@ -1,5 +1,7 @@
+import DetailPage from "../components/DetailPage";
+
 const Detail = () => {
-  return <h1></h1>;
+  return <DetailPage />;
 };
 
 export default Detail;
