@@ -1,17 +1,10 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 import { v4 as uuid } from "uuid";
-import {
-  FormContainer,
-  Input,
-  Button,
-  ErrorMessage,
-} from "../components/HomeStyle";
+import { FormContainer, Input, Button, ErrorMessage } from "./HomeStyle";
+import { ExpenseContext } from "../context/ExpenseContext";
 
-const AddExpenseForm = ({ onAddExpense }) => {
-  // const [date, setDate] = useState("");
-  // const [item, setItem] = useState("");
-  // const [amount, setAmount] = useState("");
-  // const [description, setDescription] = useState("");
+const AddExpenseForm = () => {
+  const { handleAddExpense } = useContext(ExpenseContext);
   const dateInputRef = useRef(null);
   const itemInputRef = useRef(null);
   const amountInputRef = useRef(null);
@@ -43,7 +36,7 @@ const AddExpenseForm = ({ onAddExpense }) => {
         amount: amountInputRef.current.value,
         description: descriptionInputRef.current.value,
       };
-      onAddExpense(newExpense);
+      handleAddExpense(newExpense);
       dateInputRef.current.value = "";
       itemInputRef.current.value = "";
       amountInputRef.current.value = "";
@@ -56,12 +49,9 @@ const AddExpenseForm = ({ onAddExpense }) => {
     <FormContainer onSubmit={handleSubmit}>
       <Input type="date" ref={dateInputRef} placeholder="Date" />
       {errors.date && <ErrorMessage>{errors.date}</ErrorMessage>}
-
       <Input type="text" ref={itemInputRef} placeholder="Item" />
-
       <Input type="text" ref={amountInputRef} placeholder="Amount" />
       {errors.amount && <ErrorMessage>{errors.amount}</ErrorMessage>}
-
       <Input type="text" ref={descriptionInputRef} placeholder="Description" />
       <Button type="submit">Add Expense</Button>
     </FormContainer>

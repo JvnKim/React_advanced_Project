@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ExpenseContainer,
@@ -8,6 +9,7 @@ import {
   ExpenseAmount,
   NoExpenses,
 } from "./HomeStyle";
+import { ExpenseContext } from "../context/ExpenseContext";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -17,8 +19,10 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
-const Expense = ({ expenses }) => {
+const Expense = () => {
+  const { expenses } = useContext(ExpenseContext);
   const navigate = useNavigate();
+
   const handleExpenseClick = (id) => {
     navigate(`/detail/${id}`);
   };
