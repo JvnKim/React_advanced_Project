@@ -1,7 +1,7 @@
-// DetailPage.jsx
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { updateExpense, deleteExpense } from "../redux/slices/expenseSlice";
 import {
   Container,
   FormContainer,
@@ -14,97 +14,90 @@ import {
 const DetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const expenses = useSelector((state) => state.expenses.expenses);
   const [expense, setExpense] = useState(null);
-  const [editedExpense, setEditedExpense] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [editedExpense, setEditedExpense] = useState({});
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    const selectedExpense = storedExpenses.find((exp) => exp.id === id);
-    if (selectedExpense) {
-      selectedExpense.date = new Date(selectedExpense.date)
-        .toISOString()
-        .split("T")[0];
+    const foundExpense = expenses.find((expense) => expense.id === id);
+    if (foundExpense) {
+      setExpense(foundExpense);
+      setEditedExpense(foundExpense);
     }
-    setExpense(selectedExpense);
-    setEditedExpense(selectedExpense);
-  }, [id]);
+  }, [id, expenses]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedExpense({ ...editedExpense, [name]: value });
+  const validate = () => {
+    const newErrors = {};
+    if (!editedExpense.date) newErrors.date = "Date is required";
+    if (
+      !editedExpense.amount ||
+      isNaN(editedExpense.amount) ||
+      Number(editedExpense.amount) <= 0
+    )
+      newErrors.amount = "Valid amount is required";
+    return newErrors;
   };
 
-  const handleSaveChanges = (e) => {
+  const handleUpdate = (e) => {
     e.preventDefault();
-    if (!editedExpense.date || !editedExpense.item || !editedExpense.amount) {
-      setErrorMessage("Please fill in all required fields.");
-      return;
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      dispatch(updateExpense(editedExpense));
+      navigate("/");
     }
-
-    const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    const updatedExpenses = storedExpenses.map((exp) =>
-      exp.id === id ? editedExpense : exp
-    );
-    localStorage.setItem("expenses", JSON.stringify(updatedExpenses));
-    setExpense(editedExpense);
-    setErrorMessage("");
-
-    navigate("/");
   };
 
   const handleDelete = () => {
-    const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    const updatedExpenses = storedExpenses.filter((exp) => exp.id !== id);
-    localStorage.setItem("expenses", JSON.stringify(updatedExpenses));
-    navigate("/");
-  };
-
-  const handleGoHome = () => {
+    dispatch(deleteExpense(id));
     navigate("/");
   };
 
   if (!expense) {
-    return (
-      <div>
-        <h2>Loading...</h2>
-      </div>
-    );
+    return <Container>Expense not found</Container>;
   }
 
   return (
     <Container>
-      <FormContainer onSubmit={handleSaveChanges}>
-        <h2>Expense Detail</h2>
+      <FormContainer onSubmit={handleUpdate}>
         <Input
           type="date"
-          name="date"
           value={editedExpense.date}
-          onChange={handleInputChange}
+          onChange={(e) =>
+            setEditedExpense({ ...editedExpense, date: e.target.value })
+          }
         />
+        {errors.date && <ErrorMessage>{errors.date}</ErrorMessage>}
         <Input
           type="text"
-          name="item"
           value={editedExpense.item}
-          onChange={handleInputChange}
+          onChange={(e) =>
+            setEditedExpense({ ...editedExpense, item: e.target.value })
+          }
         />
         <Input
           type="text"
-          name="amount"
           value={editedExpense.amount}
-          onChange={handleInputChange}
+          onChange={(e) =>
+            setEditedExpense({ ...editedExpense, amount: e.target.value })
+          }
         />
+        {errors.amount && <ErrorMessage>{errors.amount}</ErrorMessage>}
         <Input
           type="text"
-          name="description"
           value={editedExpense.description}
-          onChange={handleInputChange}
+          onChange={(e) =>
+            setEditedExpense({ ...editedExpense, description: e.target.value })
+          }
         />
         <ButtonGroup>
-          <Button onClick={handleSaveChanges}>Save Changes</Button>
-          {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-          <Button onClick={handleDelete}>Delete</Button>
-          <Button onClick={handleGoHome}>Go Home</Button>
+          <Button type="submit">Update</Button>
+          <Button type="button" onClick={handleDelete}>
+            Delete
+          </Button>
         </ButtonGroup>
       </FormContainer>
     </Container>

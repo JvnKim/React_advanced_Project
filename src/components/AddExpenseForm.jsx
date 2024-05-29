@@ -1,10 +1,11 @@
-import React, { useRef, useState, useContext } from "react";
+import { useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
+import { useDispatch } from "react-redux";
 import { FormContainer, Input, Button, ErrorMessage } from "./HomeStyle";
-import { ExpenseContext } from "../context/ExpenseContext";
+import { addExpense } from "../redux/slices/expenseSlice";
 
 const AddExpenseForm = () => {
-  const { handleAddExpense } = useContext(ExpenseContext);
+  const dispatch = useDispatch();
   const dateInputRef = useRef(null);
   const itemInputRef = useRef(null);
   const amountInputRef = useRef(null);
@@ -36,7 +37,7 @@ const AddExpenseForm = () => {
         amount: amountInputRef.current.value,
         description: descriptionInputRef.current.value,
       };
-      handleAddExpense(newExpense);
+      dispatch(addExpense(newExpense));
       dateInputRef.current.value = "";
       itemInputRef.current.value = "";
       amountInputRef.current.value = "";

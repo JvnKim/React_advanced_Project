@@ -1,10 +1,11 @@
-import { useContext } from "react";
+// src/pages/Home.jsx
+import { useSelector, useDispatch } from "react-redux";
 import { Container, Header, NoExpenses } from "../components/HomeStyle";
 import MonthButton from "../components/MonthButton";
 import Expense from "../components/Expense";
 import AddExpenseForm from "../components/AddExpenseForm";
 import MonthlyExpenseChart from "../components/MonthlyExpenseChart";
-import { ExpenseContext } from "../context/ExpenseContext";
+import { setActiveMonth, addExpense } from "../redux/slices/expenseSlice";
 
 const months = [
   "January",
@@ -22,11 +23,17 @@ const months = [
 ];
 
 const Home = () => {
-  const { activeMonth, setActiveMonth, expenses, handleAddExpense } =
-    useContext(ExpenseContext);
+  const dispatch = useDispatch();
+  const { activeMonth, filteredExpenses } = useSelector(
+    (state) => state.expenses
+  );
 
   const handleMonthClick = (index) => {
-    setActiveMonth((prevMonth) => (prevMonth === index ? null : index));
+    dispatch(setActiveMonth(index === activeMonth ? null : index));
+  };
+
+  const handleAddExpense = (newExpense) => {
+    dispatch(addExpense(newExpense));
   };
 
   return (
@@ -49,17 +56,12 @@ const Home = () => {
       </Container>
       <Container>
         {activeMonth === "" || (
-          <MonthlyExpenseChart
-            selectedMonth={
-              activeMonth === null ? "All Time" : months[activeMonth]
-            }
-            records={expenses}
-          />
+          <MonthlyExpenseChart selectedMonth={activeMonth} />
         )}
       </Container>
       <Container>
-        {expenses.length > 0 ? (
-          <Expense expenses={expenses} />
+        {filteredExpenses.length > 0 ? (
+          <Expense expenses={filteredExpenses} />
         ) : (
           <NoExpenses>No Expenses</NoExpenses>
         )}

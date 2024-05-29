@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   ExpenseContainer,
@@ -9,7 +9,6 @@ import {
   ExpenseAmount,
   NoExpenses,
 } from "./HomeStyle";
-import { ExpenseContext } from "../context/ExpenseContext";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -20,7 +19,7 @@ const formatDate = (dateString) => {
 };
 
 const Expense = () => {
-  const { expenses } = useContext(ExpenseContext);
+  const expenses = useSelector((state) => state.expenses.expenses);
   const navigate = useNavigate();
 
   const handleExpenseClick = (id) => {

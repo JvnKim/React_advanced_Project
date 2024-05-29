@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// src/components/MonthlyExpenseChart.jsx
+import { useSelector } from "react-redux";
 import { GraphDiv, BarWrapper, Bar } from "./HomeStyle";
 
 const stringToColor = (str) => {
@@ -14,29 +15,45 @@ const stringToColor = (str) => {
   return color;
 };
 
-const MonthlyExpenseChart = ({ selectedMonth, records = [] }) => {
-  const [totalAmount, setTotalAmount] = useState(0);
+const MonthlyExpenseChart = () => {
+  const { activeMonth, filteredExpenses } = useSelector(
+    (state) => state.expenses
+  );
 
-  useEffect(() => {
-    const calculatedTotalAmount = records.reduce(
-      (sum, record) => sum + parseInt(record.amount),
-      0
-    );
-    setTotalAmount(calculatedTotalAmount);
-  }, [records]);
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-  const maxAmount = Math.max(
-    ...records.map((record) => parseInt(record.amount)),
+  const totalAmount = filteredExpenses.reduce(
+    (sum, record) => sum + parseInt(record.amount),
     0
   );
+  const maxAmount = Math.max(
+    ...filteredExpenses.map((record) => parseInt(record.amount)),
+    0
+  );
+
+  const activeMonthName =
+    activeMonth !== null ? months[activeMonth] : "All Time";
 
   return (
     <GraphDiv>
       <h1>
-        Total Expense of {selectedMonth}: {totalAmount}
+        Total Expense of {activeMonthName}: {totalAmount}
       </h1>
       <BarWrapper>
-        {records.map((record, index) => {
+        {filteredExpenses.map((record, index) => {
           const percentage = (parseInt(record.amount) / maxAmount) * 100;
           return (
             <Bar
