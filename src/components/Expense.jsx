@@ -19,7 +19,7 @@ const formatDate = (dateString) => {
 };
 
 const Expense = () => {
-  const expenses = useSelector((state) => state.expenses.expenses);
+  const { filteredExpenses } = useSelector((state) => state.expenses);
   const navigate = useNavigate();
 
   const handleExpenseClick = (id) => {
@@ -28,10 +28,10 @@ const Expense = () => {
 
   return (
     <ExpenseContainer>
-      {expenses.length === 0 ? (
+      {filteredExpenses.length === 0 ? (
         <NoExpenses>No Expenses</NoExpenses>
       ) : (
-        expenses.map((expense, index) => (
+        filteredExpenses.map((expense, index) => (
           <ExpenseItem key={index}>
             <ExpenseDetails onClick={() => handleExpenseClick(expense.id)}>
               <ExpenseDescription>

@@ -1,4 +1,3 @@
-// src/components/MonthlyExpenseChart.jsx
 import { useSelector } from "react-redux";
 import { GraphDiv, BarWrapper, Bar } from "./HomeStyle";
 
@@ -15,25 +14,31 @@ const stringToColor = (str) => {
   return color;
 };
 
-const MonthlyExpenseChart = () => {
-  const { activeMonth, filteredExpenses } = useSelector(
-    (state) => state.expenses
-  );
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+const MonthlyExpenseChart = ({ selectedMonth }) => {
+  const { expenses } = useSelector((state) => state.expenses);
+
+  const filteredExpenses = expenses.filter((expense) => {
+    if (selectedMonth === null) {
+      return true;
+    }
+    const expenseMonth = new Date(expense.date).getMonth();
+    return expenseMonth === selectedMonth;
+  });
 
   const totalAmount = filteredExpenses.reduce(
     (sum, record) => sum + parseInt(record.amount),
@@ -45,7 +50,7 @@ const MonthlyExpenseChart = () => {
   );
 
   const activeMonthName =
-    activeMonth !== null ? months[activeMonth] : "All Time";
+    selectedMonth !== null ? months[selectedMonth] : "All Time";
 
   return (
     <GraphDiv>
